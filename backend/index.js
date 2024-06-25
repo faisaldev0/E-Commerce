@@ -1,4 +1,4 @@
-const port = 4000;
+require('dotenv').config();
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -8,8 +8,11 @@ const path = require("path");
 const cors = require("cors");
 const fs = require("fs");
 
+// Use environment variables
+const port = process.env.PORT;
+const uploadDir = process.env.UPLOAD_DIR;
+
 // Ensure the upload directory exists
-const uploadDir = "./upload/images";
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -18,9 +21,10 @@ app.use(express.json());
 app.use(cors());
 
 // Database connection with mongoose
-mongoose.connect(
-  "mongodb+srv://zeshanfa:12911234@shoppingstore.memqkao.mongodb.net/shopify"
-);
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
 // App Creation
 app.get("/", (req, res) => {
@@ -147,7 +151,7 @@ const Users = mongoose.model("Users", {
   },
   date: {
     type: Date,
-    defalt: Date.now,
+    default: Date.now,
   },
 });
 
@@ -178,11 +182,11 @@ app.post("/signup", async (req, res) => {
     },
   };
 
-  const token = jwt.sign(data, "secret_ecom");
+  const token = jwt.sign(data, process.env.JWT_SECRET);
   res.json({ success: true, token });
 });
 
-// Creating Endppoint, for use login
+// Creating Endpoint for user login
 app.post("/login", async (req, res) => {
   let user = await Users.findOne({ email: req.body.email });
   if (user) {
@@ -193,7 +197,7 @@ app.post("/login", async (req, res) => {
           id: user.id,
         },
       };
-      const token = jwt.sign(data, "secret_ecom");
+      const token = jwt.sign(data, process.env.JWT_SECRET);
       res.json({ success: true, token });
     } else {
       res.json({ success: false, errors: "Wrong Password" });
@@ -203,7 +207,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Creating endpoint for newcollection data
+// Creating endpoint for new collection data
 app.get("/newcollections", async (req, res) => {
   let products = await Product.find({});
   let newcollection = products.slice(1).slice(-8);
@@ -214,9 +218,9 @@ app.get("/newcollections", async (req, res) => {
 // Creating endpoint for popular in woman
 app.get("/popularinwomen", async (req, res) => {
   let products = await Product.find({ category: "women" });
-  let popilar_in_women = products.slice(0, 4);
+  let popular_in_women = products.slice(0, 4);
   console.log("Popular in woman fetched");
-  res.send(popilar_in_women);
+  res.send(popular_in_women);
 });
 
 // Creating middleware to fetch user
@@ -226,7 +230,7 @@ const fetchUser = async (req, res, next) => {
     res.status(401).send({ errors: "Please authenticate using valid token" });
   } else {
     try {
-      const data = jwt.verify(token, "secret_ecom");
+      const data = jwt.verify(token, process.env.JWT_SECRET);
       req.user = data.user;
       next();
     } catch (error) {
