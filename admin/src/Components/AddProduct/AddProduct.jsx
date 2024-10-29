@@ -22,42 +22,64 @@ const AddProduct = () => {
   };
 
   const Add_Product = async () => {
-    console.log(productDetails);
-    let responseData;
-    let product = productDetails;
-
-    let formData = new FormData();
-    formData.append("product", image);
-
-    await fetch("http://localhost:4000/upload", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-      },
-      body: formData,
-    })
-      .then((resp) => resp.json())
-      .then((data) => {
-        responseData = data;
-      });
-
-    if (responseData.success) {
-      product.image = responseData.image_url;
-      console.log(product);
-      await fetch("http://localhost:4000/addproduct", {
+    try {
+      console.log(productDetails);
+      let responseData;
+      let product = productDetails;
+  
+      let formData = new FormData();
+      formData.append("product", image);
+  
+      // Upload image
+      const uploadResponse = await fetch("https://e-commerce-store-1-qn5q.onrender.com/upload", {
         method: "POST",
         headers: {
           Accept: "application/json",
-          "Content-Type": "application/json",
         },
-        body: JSON.stringify(product),
-      })
-        .then((resp) => resp.json())
-        .then((data) => {
-          data.success ? alert("Product Added") : alert("Failed");
+        body: formData,
+      });
+  
+      // Check if the upload request was successful
+      if (!uploadResponse.ok) {
+        throw new Error(`Upload failed with status ${uploadResponse.status}`);
+      }
+  
+      // Parse the response
+      const uploadData = await uploadResponse.json();
+      responseData = uploadData;
+  
+      // If image upload succeeded, continue with adding the product
+      if (responseData.success) {
+        product.image = responseData.image_url;
+  
+        // Add product
+        const productResponse = await fetch("https://e-commerce-store-1-qn5q.onrender.com/addproduct", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(product),
         });
+  
+        // Check if the product addition was successful
+        if (!productResponse.ok) {
+          throw new Error(`Product addition failed with status ${productResponse.status}`);
+        }
+  
+        const productData = await productResponse.json();
+        productData.success ? alert("Product Added") : alert("Failed to Add Product");
+  
+      } else {
+        alert("Image upload failed");
+      }
+  
+    } catch (error) {
+      console.error("Error:", error);
+      alert(`Error: ${error.message}`);
     }
   };
+  
 
   return (
     <div className="add-product">
