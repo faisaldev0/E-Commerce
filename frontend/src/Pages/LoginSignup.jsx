@@ -17,7 +17,7 @@ const LoginSignup = () => {
   const login = async () => {
     console.log("Login Function Excuted", formData);
     let responseData;
-    await fetch("https://e-commerce-store-1-qn5q.onrender.com/login", {
+    await fetch("https://e-store-backend-4.onrender.com/login", {
       method: "POST",
       headers: {
         Accept: "application/form-data",
@@ -37,7 +37,7 @@ const LoginSignup = () => {
   const Signup = async () => {
     console.log("Signup Function Excuted", formData);
     let responseData;
-    await fetch("https://e-commerce-store-1-qn5q.onrender.com/signup", {
+    await fetch("https://e-store-backend-4.onrender.com/signup", {
       method: "POST",
       headers: {
         Accept: "application/form-data",

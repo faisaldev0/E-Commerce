@@ -10,7 +10,7 @@ const fs = require("fs");
 
 // Use environment variables
 const port = process.env.PORT;
-const uploadDir = './';
+const uploadDir = './upload/images';
 
 // Ensure the upload directory exists
 if (!fs.existsSync(uploadDir)) {
@@ -22,8 +22,6 @@ app.use(cors());
 
 // Database connection with mongoose
 mongoose.connect(process.env.MONGODB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
 });
 
 // App Creation
@@ -48,7 +46,7 @@ app.use("/upload/images", express.static(uploadDir));
 app.post("/upload", upload.single("product"), (req, res) => {
   res.json({
     success: 1,
-    image_url: `${process.env.BACKEND_URL}/images/${req.file.filename}`,
+    image_url: `${process.env.BACKEND_URL}/upload/images/${req.file.filename}`,
   });
 });
 
