@@ -29,7 +29,7 @@ const Navbar = () => {
     <div className="navbar">
       <div onClick={handleLogoClick} className="nav-logo">
         <img src={logo} alt="" />
-        <p>SHOPPER</p>
+        <p>NestStore</p>
       </div>
       <img
         className="nav-dropdown"

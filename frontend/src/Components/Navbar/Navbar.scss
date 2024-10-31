@@ -11,13 +11,13 @@
 
   .nav-logo {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     gap: 10px;
     cursor: pointer;
 
     p {
       color: #171717;
-      font-size: 38px;
+      font-size: 27px;
       font-weight: 600;
     }
   }
