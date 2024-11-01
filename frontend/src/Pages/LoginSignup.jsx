@@ -17,7 +17,7 @@ const LoginSignup = () => {
   const login = async () => {
     console.log("Login Function Excuted", formData);
     let responseData;
-    await fetch("https://e-store-backend-4.onrender.com/login", {
+    await fetch("http://localhost:4000/login", {
       method: "POST",
       headers: {
         Accept: "application/form-data",
@@ -37,7 +37,7 @@ const LoginSignup = () => {
   const Signup = async () => {
     console.log("Signup Function Excuted", formData);
     let responseData;
-    await fetch("https://e-store-backend-4.onrender.com/signup", {
+    await fetch("http://localhost:4000/signup", {
       method: "POST",
       headers: {
         Accept: "application/form-data",

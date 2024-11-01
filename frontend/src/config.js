@@ -1,5 +1,5 @@
 const config = {
-  backendURL: "https://e-store-backend-4.onrender.com"
+  backendURL: "http://localhost:4000"
 };
 
 export default config;

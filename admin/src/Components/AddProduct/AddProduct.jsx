@@ -4,15 +4,14 @@ import "./AddProduct.scss";
 import upload_area from "../../assets/upload_area.svg";
 
 const AddProduct = () => {
-  const [image, setImage] = useState(false);
-
+  const [image, setImage] = useState(null);
   const [productDetails, setProductDetails] = useState({
     name: "",
-    image: "",
     category: "women",
     new_price: "",
     old_price: "",
   });
+
   const imageHandler = (e) => {
     setImage(e.target.files[0]);
   };
@@ -23,63 +22,52 @@ const AddProduct = () => {
 
   const Add_Product = async () => {
     try {
-      console.log(productDetails);
-      let responseData;
-      let product = productDetails;
-  
       let formData = new FormData();
-      formData.append("product", image);
-  
+      formData.append("product", image); // Use "file" to match backend expectation
+
       // Upload image
-      const uploadResponse = await fetch("https://e-store-backend-4.onrender.com/upload", {
+      const uploadResponse = await fetch("http://localhost:4000/upload", {
         method: "POST",
-        headers: {
-          Accept: "application/json",
-        },
         body: formData,
       });
-  
-      // Check if the upload request was successful
+
       if (!uploadResponse.ok) {
-        throw new Error(`Upload failed with status ${uploadResponse.status}`);
+        const errorResponse = await uploadResponse.json();
+        throw new Error(`Upload failed: ${errorResponse.message}`);
       }
-  
-      // Parse the response
+
       const uploadData = await uploadResponse.json();
-      responseData = uploadData;
-  
-      // If image upload succeeded, continue with adding the product
-      if (responseData.success) {
-        product.image = responseData.image_url;
-  
+
+      if (uploadData.success) {
+        const product = {
+          ...productDetails,
+          image: uploadData.image_url, // Set image URL from upload
+        };
+
         // Add product
-        const productResponse = await fetch("https://e-store-backend-4.onrender.com/addproduct", {
+        const productResponse = await fetch("http://localhost:4000/addproduct", {
           method: "POST",
           headers: {
-            Accept: "application/json",
             "Content-Type": "application/json",
           },
           body: JSON.stringify(product),
         });
-  
-        // Check if the product addition was successful
+
         if (!productResponse.ok) {
-          throw new Error(`Product addition failed with status ${productResponse.status}`);
+          const errorResponse = await productResponse.json();
+          throw new Error(`Product addition failed: ${errorResponse.message}`);
         }
-  
+
         const productData = await productResponse.json();
-        productData.success ? alert("Product Added") : alert("Failed to Add Product");
-  
+        alert(productData.success ? "Product Added" : "Failed to Add Product");
       } else {
         alert("Image upload failed");
       }
-  
     } catch (error) {
       console.error("Error:", error);
       alert(`Error: ${error.message}`);
     }
   };
-  
 
   return (
     <div className="add-product">
@@ -123,7 +111,7 @@ const AddProduct = () => {
           name="category"
           className="add-product-selector"
         >
-          <option value="Women">Women</option>
+          <option value="women">Women</option>
           <option value="men">Men</option>
           <option value="kid">Kid</option>
         </select>
@@ -133,7 +121,7 @@ const AddProduct = () => {
           <img
             src={image ? URL.createObjectURL(image) : upload_area}
             className="addproduct-thumbnail-img"
-            alt=""
+            alt="Upload area"
           />
         </label>
         <input
@@ -145,9 +133,7 @@ const AddProduct = () => {
         />
       </div>
       <button
-        onClick={() => {
-          Add_Product();
-        }}
+        onClick={Add_Product}
         className="addproduct-btn"
       >
         ADD
